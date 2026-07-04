@@ -1,0 +1,18 @@
+{
+  "title": "Explainable Heart Disease Risk Prediction (SHAP-based)",
+  "description": "An explainable machine-learning demo that predicts heart disease risk from clinical indicators and returns per-patient SHAP attributions in clinician-facing language. Purpose is interpretability, not accuracy. UCI Heart Disease (Cleveland) public dataset.",
+  "upload_type": "software",
+  "access_right": "open",
+  "license": "MIT",
+  "keywords": [
+    "explainable AI",
+    "SHAP",
+    "clinical decision support",
+    "heart disease",
+    "interpretable machine learning",
+    "medical AI"
+  ],
+  "creators": [
+    { "name": "Lee, Seunghyun", "orcid": "0009-0006-1926-653X", "affiliation": "Korea University" }
+  ]
+}
