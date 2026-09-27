@@ -1,47 +1,56 @@
-# 🫀 Explainable Heart Disease Risk (설명 가능한 심질환 위험 예측)
+# 🫀 Explainable Heart Disease Risk
 
-임상 지표로 심질환 위험을 예측하고, **모델이 왜 그렇게 판단했는지**를
-환자별 SHAP 기여도로 '의사 언어'로 되돌려주는 데모.
-정확도 경쟁이 아니라 **설명 가능성(explainability)** 이 목적입니다.
+Heart disease risk prediction from clinical features, with per-patient SHAP attributions reported back in clinical terms.
 
-> ⚠️ 연구·교육용 데모입니다. 실제 진단·진료 도구가 아닙니다.
+The demo predicts heart disease risk from clinical indicators and explains **why the model decided so** by translating per-patient SHAP contributions into "clinician language". The goal is **explainability**, not an accuracy race.
 
-## 왜 이 프로젝트인가
-블랙박스 예측은 임상에서 신뢰받기 어렵습니다. 이 데모는 한 환자의
-예측에 대해 각 임상 지표가 위험을 **얼마나 높였는지(↑)/낮췄는지(↓)**
-분해해, 임상의가 근거를 검토할 수 있게 합니다.
+> ⚠️ Research and education demo. Not a real diagnostic or clinical tool.
 
-## 성능
-| 지표 | 값 |
+## Why this project
+
+Black-box predictions are hard to trust in the clinic. For a single patient's prediction, this demo decomposes **how much each clinical indicator raised (↑) or lowered (↓)** the risk, so a clinician can review the evidence.
+
+## Performance
+
+| Metric | Value |
 |---|---|
-| 5-fold 교차검증 AUC | **0.907** |
-| 5-fold 교차검증 정확도 | **0.825** |
+| 5-fold cross-validated AUC | **0.907** |
+| 5-fold cross-validated accuracy | **0.825** |
 
-RandomForest + SHAP TreeExplainer. UCI Heart Disease (Cleveland, 303건, 공개 데이터).
+RandomForest + SHAP TreeExplainer. UCI Heart Disease (Cleveland, 303 records, public data).
 
-## 구조
+## Repository layout
+
 ```
-src/features.py   임상 지표 메타데이터 (의사 언어 매핑)
-src/data.py       UCI 데이터 로드/캐싱, 결측 대치, 타깃 이진화
-src/train.py      모델 학습·교차검증·저장
-src/explain.py    SHAP 기반 환자별 설명 레이어
-app.py            Gradio 데모 (위험 확률 + 근거)
+src/features.py   clinical feature metadata (mapping to clinician language)
+src/data.py       UCI data loading/caching, missing-value imputation, target binarization
+src/train.py      model training, cross-validation, saving
+src/explain.py    SHAP-based per-patient explanation layer
+app.py            Gradio demo (risk probability + evidence)
 ```
 
-## 실행
+## How to run
+
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python -m src.train      # 모델 학습
-python app.py            # 데모 실행
+python -m src.train      # train the model
+python app.py            # launch the demo
 ```
 
-## 데이터 출처
-UCI Machine Learning Repository — Heart Disease (Cleveland).
+## Data source
+
+UCI Machine Learning Repository, Heart Disease (Cleveland).
 https://archive.ics.uci.edu/dataset/45/heart+disease
 
-## 인용 / DOI
-릴리즈는 Zenodo에 아카이빙되어 DOI가 발급됩니다. (발급 후 배지 추가)
+## Citation / DOI
 
-## 라이선스
+Releases are archived on Zenodo, which issues a DOI (badge to be added once issued). Citation metadata: `CITATION.cff`.
+
+## License
+
 MIT
+
+**Status:** research/education demo.
+
+More projects: https://github.com/lshpy

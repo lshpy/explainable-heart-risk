@@ -1,7 +1,7 @@
-"""설명 가능한 심질환 위험 예측 데모 (Gradio).
+"""Explainable heart disease risk prediction demo (Gradio).
 
-한 환자의 임상 지표를 입력하면
-(1) 위험 확률과 (2) '왜 그렇게 판단했는지'를 지표별 기여도로 보여준다.
+Enter one patient's clinical features to see
+(1) the risk probability and (2) "why the model decided so" as per-feature contributions.
 """
 from __future__ import annotations
 
@@ -17,13 +17,13 @@ from src.train import MODEL_PATH, load_model, train_and_save
 
 import pandas as pd
 
-# 모델 없으면 즉석 학습
+# train on the fly if no model exists
 if not MODEL_PATH.exists():
     train_and_save()
 _model, _columns = load_model()
 _explainer = Explainer(_model, _columns)
 
-# 예시 환자 (전형적 고위험)
+# example patient (typical high risk)
 EXAMPLE = [63, 1, 4, 145, 233, 0, 2, 150, 0, 2.3, 3, 0, 6]
 
 
@@ -35,15 +35,15 @@ def predict(age, sex, cp, trestbps, chol, fbs, restecg,
     result = _explainer.explain_one(x, top_k=6)
 
     proba = result["risk_probability"]
-    verdict = "높음 ⚠️" if proba >= 0.5 else "낮음 ✅"
-    summary = f"## 심질환 위험: **{proba*100:.0f}%** ({verdict})\n\n### 판단 근거 (기여 순)\n"
+    verdict = "high ⚠️" if proba >= 0.5 else "low ✅"
+    summary = f"## Heart disease risk: **{proba*100:.0f}%** ({verdict})\n\n### Evidence (by contribution)\n"
     for r in result["top_factors"]:
         bar = "█" * min(10, int(abs(r["impact"]) * 40) + 1)
         summary += f"- **{r['label']}** → {r['direction']}  `{bar}`\n"
     summary += (
-        "\n> 위험 ↑ = 이 지표가 위험을 높이는 방향으로 작용, "
-        "위험 ↓ = 낮추는 방향.\n"
-        "> 연구·교육용 데모이며 진단 도구가 아닙니다."
+        "\n> risk ↑ = this feature pushes the risk up, "
+        "risk ↓ = pushes it down.\n"
+        "> Research/education demo, not a diagnostic tool."
     )
     return summary
 
@@ -52,11 +52,11 @@ def _num_choices(feature):
     return [(f"{v} — {lab}", v) for v, lab in CATEGORY_LABELS[feature].items()]
 
 
-with gr.Blocks(title="설명 가능한 심질환 위험 예측") as demo:
+with gr.Blocks(title="Explainable heart disease risk prediction") as demo:
     gr.Markdown(
-        "# 🫀 설명 가능한 심질환 위험 예측\n"
-        "임상 지표를 입력하면 위험 확률과 **그 근거**를 지표별로 보여줍니다. "
-        "정확도가 아니라 *설명*이 목적입니다. (UCI Heart Disease, 공개 데이터)"
+        "# 🫀 Explainable heart disease risk prediction\n"
+        "Enter clinical features to see the risk probability and **its evidence** per feature. "
+        "The goal is *explanation*, not accuracy. (UCI Heart Disease, public data)"
     )
     with gr.Row():
         with gr.Column():
@@ -74,7 +74,7 @@ with gr.Blocks(title="설명 가능한 심질환 위험 예측") as demo:
             slope = gr.Radio(_num_choices("slope"), value=3, label=DISPLAY_NAME["slope"])
             ca = gr.Slider(0, 3, value=0, step=1, label=DISPLAY_NAME["ca"])
             thal = gr.Radio(_num_choices("thal"), value=6, label=DISPLAY_NAME["thal"])
-    btn = gr.Button("위험도 예측 + 설명", variant="primary")
+    btn = gr.Button("Predict risk + explain", variant="primary")
     out = gr.Markdown()
     btn.click(
         predict,

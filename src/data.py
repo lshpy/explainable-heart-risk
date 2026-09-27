@@ -1,7 +1,7 @@
-"""UCI Heart Disease (Cleveland) 데이터 로드 및 캐싱.
+"""Load and cache the UCI Heart Disease (Cleveland) data.
 
-공개 데이터셋이라 개인정보·IRB 이슈 없음.
-출처: https://archive.ics.uci.edu/dataset/45/heart+disease
+Public dataset, so no privacy/IRB issues.
+Source: https://archive.ics.uci.edu/dataset/45/heart+disease
 """
 from __future__ import annotations
 
@@ -33,12 +33,12 @@ def _download() -> Path:
 
 
 def load_dataframe() -> pd.DataFrame:
-    """정제된 데이터프레임 반환. 결측('?') 행은 중앙값 대치."""
+    """Return the cleaned dataframe. Missing ('?') values are median-imputed."""
     path = _download()
     df = pd.read_csv(path, header=None, names=COLUMNS, na_values="?")
-    # 결측치는 열 중앙값으로 대치 (ca, thal에 소수 존재)
+    # impute missing values with the column median (a few in ca, thal)
     df = df.fillna(df.median(numeric_only=True))
-    # 타깃 이진화: 0 = 질환 없음, 1 = 질환 있음
+    # binarize target: 0 = no disease, 1 = disease
     df[TARGET_COLUMN] = (df[TARGET_COLUMN] > 0).astype(int)
     return df
 
@@ -52,5 +52,5 @@ def load_xy():
 
 if __name__ == "__main__":
     X, y = load_xy()
-    print(f"샘플 {len(X)}건, 지표 {X.shape[1]}개")
-    print(f"질환 있음 {int(y.sum())} / 없음 {int((1 - y).sum())}")
+    print(f"{len(X)} samples, {X.shape[1]} features")
+    print(f"disease {int(y.sum())} / no disease {int((1 - y).sum())}")

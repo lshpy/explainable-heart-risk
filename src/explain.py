@@ -1,7 +1,7 @@
-"""SHAP 기반 설명 레이어.
+"""SHAP-based explanation layer.
 
-한 환자의 예측에 대해 각 임상 지표가 위험을 얼마나 밀었는지(+)/낮췄는지(-)
-분해하여 '의사 언어'로 돌려준다.
+For one patient's prediction, decompose how much each clinical feature pushed the risk up (+) or down (-)
+and report it back in "clinician language".
 """
 from __future__ import annotations
 
@@ -19,11 +19,11 @@ class Explainer:
         self._explainer = shap.TreeExplainer(model)
 
     def explain_one(self, x_row: pd.DataFrame, top_k: int = 5) -> dict:
-        """단일 환자 설명. 위험을 높인/낮춘 상위 지표를 반환."""
+        """Explain a single patient. Returns the top features that raised/lowered the risk."""
         proba = float(self.model.predict_proba(x_row)[0, 1])
 
         sv = self._explainer.shap_values(x_row)
-        # 이진 분류: 클래스 1(질환 있음)에 대한 기여도
+        # binary classification: contributions toward class 1 (disease)
         contrib = _positive_class_shap(sv)[0]
 
         rows = []
@@ -33,7 +33,7 @@ class Explainer:
                     "feature": col,
                     "label": humanize(col, val),
                     "impact": float(c),
-                    "direction": "위험 ↑" if c > 0 else "위험 ↓",
+                    "direction": "risk ↑" if c > 0 else "risk ↓",
                 }
             )
         rows.sort(key=lambda r: abs(r["impact"]), reverse=True)
@@ -46,7 +46,7 @@ class Explainer:
 
 
 def _positive_class_shap(shap_values):
-    """SHAP 버전별 출력 형태를 클래스1 (n_samples, n_features)로 정규화."""
+    """Normalize the version-dependent SHAP output shape to class 1 (n_samples, n_features)."""
     if isinstance(shap_values, list):  # [class0, class1]
         return np.asarray(shap_values[1])
     arr = np.asarray(shap_values)
